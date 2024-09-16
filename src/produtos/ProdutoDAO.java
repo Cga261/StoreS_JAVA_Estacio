@@ -52,7 +52,8 @@ public class ProdutoDAO {
         }
         return produtos;
     }
- // Método para editar um produto no banco de dados
+
+    // Método para editar um produto no banco de dados
     public void editarProduto(Produto produto) {
         String sql = "UPDATE produtos SET nome_produto = ?, preco = ?, quantidade = ? WHERE id = ?";
 
@@ -75,8 +76,8 @@ public class ProdutoDAO {
             e.printStackTrace();
         }
     }
-    
- // Método para remover um produto do banco de dados
+
+    // Método para remover um produto do banco de dados
     public void removerProduto(int id) {
         String sql = "DELETE FROM produtos WHERE id = ?";
 
@@ -97,5 +98,75 @@ public class ProdutoDAO {
         }
     }
 
+    // Método para buscar um produto pelo nome
+    public Produto buscarProdutoPorNome(String nome) {
+        String sql = "SELECT * FROM produtos WHERE nome_produto = ?";
+        Produto produto = null;
 
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, nome);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    produto = new Produto(
+                        rs.getString("nome_produto"),
+                        rs.getDouble("preco"),
+                        rs.getInt("quantidade")
+                    );
+                    produto.setId(rs.getInt("id"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return produto;
+    }
+
+    // Método para buscar um produto pelo ID
+    public Produto buscarProdutoPorId(int id) {
+        String sql = "SELECT * FROM produtos WHERE id = ?";
+        Produto produto = null;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    produto = new Produto(
+                        rs.getString("nome_produto"),
+                        rs.getDouble("preco"),
+                        rs.getInt("quantidade")
+                    );
+                    produto.setId(rs.getInt("id"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return produto;
+    }
+
+    // Método para atualizar o estoque após uma venda
+    public void atualizarEstoqueAposVenda(int id, int quantidadeVendida) {
+        String sql = "UPDATE produtos SET quantidade = quantidade - ? WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, quantidadeVendida);
+            stmt.setInt(2, id);
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Estoque atualizado com sucesso!");
+            } else {
+                System.out.println("Produto não encontrado para atualizar o estoque.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

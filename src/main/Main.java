@@ -6,6 +6,7 @@ import java.util.Scanner;
 import Login.LoginController;
 import produtos.Produto;
 import produtos.ProdutoDAO;
+import vendas.Venda;
 
 public class Main {
 
@@ -33,10 +34,12 @@ public class Main {
         int opcao = 0;
         do {
             System.out.println("\nMenu:");
-            System.out.println("1. Cadastrar Produto");
+            System.out.println("1. Cadastrar Produto Manualmente");
             System.out.println("2. Listar Produtos");
             System.out.println("3. Editar Produto");
             System.out.println("4. Remover Produto");
+            System.out.println("5. Comprar de Fornecedor");
+            System.out.println("6. Realizar Venda");
             System.out.println("0. Sair");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
@@ -44,7 +47,7 @@ public class Main {
 
             switch (opcao) {
                 case 1:
-                    // Cadastro de Produto
+                    // Cadastro de Produto Manualmente
                     System.out.print("Nome do produto: ");
                     String nomeProduto = scanner.nextLine();
 
@@ -103,6 +106,67 @@ public class Main {
                     produtoDAO.removerProduto(idRemover);
                     break;
 
+                case 5:
+                    // Compra de Produtos
+                    System.out.print("Nome do produto para compra: ");
+                    String nomeProdutoCompra = scanner.nextLine();
+                    
+                    Produto produtoParaCompra = produtoDAO.buscarProdutoPorNome(nomeProdutoCompra);
+
+                    if (produtoParaCompra == null) {
+                        System.out.println("Produto não encontrado.");
+                        break;
+                    }
+
+                    System.out.print("Quantidade a ser comprada: ");
+                    int quantidadeCompra = scanner.nextInt();
+
+                    System.out.print("Porcentagem de lucro: ");
+                    double porcentagemLucro = scanner.nextDouble();
+
+                    double precoCompra = produtoParaCompra.getPreco();
+                    double precoVenda = precoCompra * (1 + porcentagemLucro / 100);
+
+                    // Cria um novo produto para a lista com o preço atualizado
+                    Produto produtoParaCadastro = new Produto(nomeProdutoCompra, precoVenda, quantidadeCompra);
+                    produtoDAO.cadastrarProduto(produtoParaCadastro);
+
+                    System.out.println("Compra registrada com sucesso!");
+                    break;
+
+                case 6:
+                    // Venda de Produtos
+                    System.out.print("Nome do produto a ser vendido: ");
+                    String nomeProdutoVenda = scanner.nextLine();
+
+                    Produto produtoParaVenda = produtoDAO.buscarProdutoPorNome(nomeProdutoVenda);
+
+                    if (produtoParaVenda == null) {
+                        System.out.println("Produto não encontrado.");
+                        break;
+                    }
+
+                    System.out.print("Quantidade a ser vendida: ");
+                    int quantidadeVenda = scanner.nextInt();
+                    scanner.nextLine(); // Limpa o buffer
+
+                    if (quantidadeVenda > produtoParaVenda.getQuantidade()) {
+                        System.out.println("Quantidade vendida excede a quantidade em estoque.");
+                        break;
+                    }
+
+                    double valorVenda = produtoParaVenda.getPreco() * quantidadeVenda;
+                    Venda venda = new Venda(produtoParaVenda, quantidadeVenda, valorVenda);
+
+                    // Atualiza o estoque após a venda
+                    produtoDAO.atualizarEstoqueAposVenda(produtoParaVenda.getId(), quantidadeVenda);
+
+                    System.out.println("Venda registrada com sucesso!");
+                    System.out.println("Produto: " + venda.getProduto().getNome());
+                    System.out.println("Quantidade Vendida: " + venda.getQuantidadeVendida());
+                    System.out.println("Valor Total: " + venda.getValorTotal());
+                    break;
+
                 case 0:
                     System.out.println("Encerrando o sistema...");
                     break;
@@ -116,4 +180,3 @@ public class Main {
         scanner.close();
     }
 }
-
