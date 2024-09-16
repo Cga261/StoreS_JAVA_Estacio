@@ -35,6 +35,8 @@ public class Main {
             System.out.println("\nMenu:");
             System.out.println("1. Cadastrar Produto");
             System.out.println("2. Listar Produtos");
+            System.out.println("3. Editar Produto");
+            System.out.println("4. Remover Produto");
             System.out.println("0. Sair");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
@@ -74,6 +76,33 @@ public class Main {
                     }
                     break;
 
+                case 3:
+                    // Edição de Produto
+                    System.out.print("Digite o ID do produto a ser editado: ");
+                    int idEditar = scanner.nextInt();
+                    scanner.nextLine(); // Limpa o buffer
+
+                    System.out.print("Novo nome do produto: ");
+                    String novoNome = scanner.nextLine();
+
+                    System.out.print("Novo preço do produto: ");
+                    double novoPreco = scanner.nextDouble();
+
+                    System.out.print("Nova quantidade do produto: ");
+                    int novaQuantidade = scanner.nextInt();
+
+                    Produto produtoEditado = new Produto(novoNome, novoPreco, novaQuantidade);
+                    produtoEditado.setId(idEditar);
+                    produtoDAO.editarProduto(produtoEditado);
+                    break;
+
+                case 4:
+                    // Remoção de Produto
+                    System.out.print("Digite o ID do produto a ser removido: ");
+                    int idRemover = scanner.nextInt();
+                    produtoDAO.removerProduto(idRemover);
+                    break;
+
                 case 0:
                     System.out.println("Encerrando o sistema...");
                     break;
@@ -87,3 +116,4 @@ public class Main {
         scanner.close();
     }
 }
+

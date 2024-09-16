@@ -52,4 +52,50 @@ public class ProdutoDAO {
         }
         return produtos;
     }
+ // Método para editar um produto no banco de dados
+    public void editarProduto(Produto produto) {
+        String sql = "UPDATE produtos SET nome_produto = ?, preco = ?, quantidade = ? WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, produto.getNome());
+            stmt.setDouble(2, produto.getPreco());
+            stmt.setInt(3, produto.getQuantidade());
+            stmt.setInt(4, produto.getId());
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Produto atualizado com sucesso!");
+            } else {
+                System.out.println("Produto não encontrado.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+ // Método para remover um produto do banco de dados
+    public void removerProduto(int id) {
+        String sql = "DELETE FROM produtos WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Produto removido com sucesso!");
+            } else {
+                System.out.println("Produto não encontrado.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
